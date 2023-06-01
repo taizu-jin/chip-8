@@ -142,6 +142,9 @@ impl CPU {
 
     /// 00EE - RET
     ///
+    /// Return from a subroutine. The interpreter sets the program counter to the address at the
+    /// top of the stack, then substracts 1 from the stack pointer.
+    ///
     /// # Panics
     ///
     /// Stack underflow.
@@ -155,7 +158,7 @@ impl CPU {
         self.program_counter = call_addr as usize;
     }
 
-    /// Reset CPU to initial state
+    /// Reset CPU to initial state.
     pub fn reset(&mut self) {
         *self = Self::new();
     }
