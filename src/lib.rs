@@ -68,7 +68,7 @@ impl CPU {
     ///
     /// Set Vx = Vx AND Vy. Performs  a bitwise AND on the values of Vx and Vy, then stores the
     /// result in Vx. A bitwise AND compares the corresponding bits from two values, and if both
-    /// bits are 1, the the same bit in the result is also 1. Otherwise, it is 0.
+    /// bits are 1,then the same bit in the result is also 1. Otherwise, it is 0.
     fn and_xy(&mut self, vx: u8, vy: u8) {
         let x = self.registers[vx as usize];
         let y = self.registers[vy as usize];
