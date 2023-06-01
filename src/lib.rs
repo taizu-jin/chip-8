@@ -306,4 +306,20 @@ mod tests {
 
         assert_eq!(cpu.registers[0], 45);
     }
+
+    #[test]
+    fn shr_xy() {
+        let mut cpu = CPU::new();
+        cpu.registers[0] = 5;
+
+        let mem = &mut cpu.memory;
+
+        mem[0x200] = 0x80;
+        mem[0x201] = 0x16;
+
+        cpu.run();
+
+        assert_eq!(2, cpu.registers[0]);
+        assert_eq!(1, cpu.registers[0xF]);
+    }
 }
