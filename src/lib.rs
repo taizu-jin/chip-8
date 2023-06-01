@@ -61,10 +61,30 @@ impl CPU {
                     4 => self.add(x, self.registers[y as usize]),
                     5 => self.sub_xy(x, y),
                     6 => self.shr_xy(x, y),
+                    7 => self.subn_xy(x, y),
                     _ => todo!("opcode {:04x}", opcode),
                 },
                 _ => todo!("opcode {:04x}", opcode),
             }
+        }
+    }
+
+    /// 8xy7 - subn Vx, Vy.
+    ///
+    /// Set Vx = Vy - Vx, set VF = NOT Borrow. If Vy ¿ Vx, then VF i set to 1, otherwise 0. Then Vx
+    /// is subtracted from Vy, and the results stored in Vx.
+    fn subn_xy(&mut self, vx: u8, vy: u8) {
+        let x = self.registers[vx as usize];
+        let y = self.registers[vy as usize];
+
+        let (val, is_overflown) = y.overflowing_sub(x);
+
+        self.registers[vx as usize] = val;
+
+        if is_overflown {
+            self.registers[0xF] = 1;
+        } else {
+            self.registers[0xF] = 0;
         }
     }
 
