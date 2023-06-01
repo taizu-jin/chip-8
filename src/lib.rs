@@ -57,12 +57,26 @@ impl CPU {
                     0 => self.ld(x, self.registers[y as usize]),
                     1 => self.or_xy(x, y),
                     2 => self.and_xy(x, y),
+                    3 => self.xor_xy(x, y),
                     4 => self.add(x, self.registers[y as usize]),
                     _ => todo!("opcode {:04x}", opcode),
                 },
                 _ => todo!("opcode {:04x}", opcode),
             }
         }
+    }
+
+    /// 8xy1 - XOR Vx, Vy
+    ///
+    /// Set Vx = Vx XOR Vy. Performs  a bitwise exclusive OR on the values of Vx and Vy, then stores the
+    /// result in Vx. An exclusive bitwise OR compares bits from two values, and if the bits arne
+    /// not both the same, then the corresponding bit in the result is set to 1. Otherwise, it is
+    /// 0.
+    fn xor_xy(&mut self, vx: u8, vy: u8) {
+        let x = self.registers[vx as usize];
+        let y = self.registers[vy as usize];
+
+        self.registers[vx as usize] = x ^ y;
     }
 
     /// 8xy1 - OR Vx, Vy
