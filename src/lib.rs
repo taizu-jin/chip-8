@@ -38,6 +38,7 @@ impl CPU {
             let x = ((opcode & 0x0F00) >> 8) as u8;
             let y = ((opcode & 0x00F0) >> 4) as u8;
 
+            let kk = (opcode & 0x00FF) as u8;
             let nnn = opcode & 0x0FFF;
 
             self.program_counter += 2;
@@ -47,6 +48,7 @@ impl CPU {
                 0x00EE => self.ret(),
                 0x1000..=0x1FFF => self.jmp(nnn),
                 0x2000..=0x2FFF => self.call(nnn),
+                0x3000..=0x3FFF => self.se(x, kk),
                 0x8000..=0x8FFF => match op_subgroup {
                     4 => self.add_xy(x, y),
                     _ => todo!("opcode {:04x}", opcode),
@@ -61,6 +63,16 @@ impl CPU {
     /// Jump to location nnn. The interpreter sets the program counter to nnn.
     fn jmp(&mut self, addr: u16) {
         self.program_counter = addr as usize;
+    }
+
+    /// 3xkk - SE Vx, byte
+    ///
+    /// Skip next instructon if Vx = kk. The interpreter compares register Vx to kk, and if they
+    /// are equal, increments the program counter by 2.
+    fn se(&mut self, vx: u8, kk: u8) {
+        if vx == kk {
+            self.program_counter += 2;
+        }
     }
     /// 8xy4 - ADD Vx, Vy.
     fn add_xy(&mut self, vx: u8, vy: u8) {
