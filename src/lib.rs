@@ -54,7 +54,7 @@ impl CPU {
                 0x6000..=0x6FFF => self.ld(x, kk),
                 0x7000..=0x7FFF => self.add(x, kk),
                 0x8000..=0x8FFF => match op_subgroup {
-                    1 => self.ld(x, self.registers[y as usize]),
+                    0 => self.ld(x, self.registers[y as usize]),
                     4 => self.add(x, self.registers[y as usize]),
                     _ => todo!("opcode {:04x}", opcode),
                 },
