@@ -65,6 +65,7 @@ impl CPU {
                     8 => self.shl_xy(x, y),
                     _ => todo!("opcode {:04x}", opcode),
                 },
+                0x9000..=0x9FF0 => self.sne(x, self.registers[y as usize]),
                 _ => todo!("opcode {:04x}", opcode),
             }
         }
@@ -351,6 +352,7 @@ mod tests {
 
         assert_eq!(2, cpu.registers[0]);
         assert_eq!(1, cpu.registers[0xF]);
+
         cpu.reset();
         cpu.registers[0] = 4;
 
