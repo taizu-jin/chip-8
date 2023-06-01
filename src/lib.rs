@@ -365,4 +365,32 @@ mod tests {
         assert_eq!(0, cpu.registers[0xF]);
     }
 
+    #[test]
+    fn shl_xy() {
+        let mut cpu = CPU::new();
+        cpu.registers[0] = 0x81;
+
+        let mem = &mut cpu.memory;
+
+        mem[0x200] = 0x80;
+        mem[0x201] = 0x18;
+
+        cpu.run();
+
+        assert_eq!(2, cpu.registers[0]);
+        assert_eq!(1, cpu.registers[0xF]);
+
+        cpu.reset();
+        cpu.registers[0] = 0x01;
+
+        let mem = &mut cpu.memory;
+
+        mem[0x200] = 0x80;
+        mem[0x201] = 0x18;
+
+        cpu.run();
+
+        assert_eq!(2, cpu.registers[0]);
+        assert_eq!(0, cpu.registers[0xF]);
+    }
 }
