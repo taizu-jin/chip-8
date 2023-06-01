@@ -351,5 +351,18 @@ mod tests {
 
         assert_eq!(2, cpu.registers[0]);
         assert_eq!(1, cpu.registers[0xF]);
+        cpu.reset();
+        cpu.registers[0] = 4;
+
+        let mem = &mut cpu.memory;
+
+        mem[0x200] = 0x80;
+        mem[0x201] = 0x16;
+
+        cpu.run();
+
+        assert_eq!(2, cpu.registers[0]);
+        assert_eq!(0, cpu.registers[0xF]);
     }
+
 }
