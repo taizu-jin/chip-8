@@ -52,6 +52,7 @@ impl CPU {
                 0x4000..=0x4FFF => self.sne(x, kk),
                 0x5000..=0x5FFF => self.se(x, y),
                 0x6000..=0x6FFF => self.ld(x, kk),
+                0x7000..=0x7FFF => self.add(x, kk),
                 0x8000..=0x8FFF => match op_subgroup {
                     4 => self.add_xy(x, y),
                     _ => todo!("opcode {:04x}", opcode),
@@ -93,6 +94,21 @@ impl CPU {
     /// Set Vx = kk. The interpreter puts the value kk into register Vx.
     fn ld(&mut self, vx: u8, kk: u8) {
         self.registers[vx as usize] = kk;
+    }
+
+    /// 7xkk - ADD Vx, byte
+    ///
+    /// Set Vx = Vx + kk. Adds the value kk to the value of register Vx, then stores the result in
+    /// Vx.
+    fn add(&mut self, vx: u8, kk: u8) {
+        let x = &mut self.registers[vx as usize];
+        let (_, is_overflown) = x.overflowing_add(kk);
+
+        if is_overflown {
+            self.registers[0xF] = 1;
+        } else {
+            self.registers[0xF] = 0;
+        }
     }
 
     /// 8xy4 - ADD Vx, Vy.
