@@ -45,6 +45,7 @@ impl CPU {
             match opcode {
                 0x0000 => return,
                 0x00EE => self.ret(),
+                0x1000..=0x1FFF => self.jmp(nnn),
                 0x2000..=0x2FFF => self.call(nnn),
                 0x8000..=0x8FFF => match op_subgroup {
                     4 => self.add_xy(x, y),
@@ -55,6 +56,12 @@ impl CPU {
         }
     }
 
+    /// 1nnn - JP addr.
+    ///
+    /// Jump to location nnn. The interpreter sets the program counter to nnn.
+    fn jmp(&mut self, addr: u16) {
+        self.program_counter = addr as usize;
+    }
     /// 8xy4 - ADD Vx, Vy.
     fn add_xy(&mut self, vx: u8, vy: u8) {
         let x = self.registers[vx as usize];
