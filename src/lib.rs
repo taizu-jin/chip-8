@@ -60,11 +60,22 @@ impl CPU {
                     3 => self.xor_xy(x, y),
                     4 => self.add(x, self.registers[y as usize]),
                     5 => self.sub_xy(x, y),
+                    6 => self.shr_xy(x, y),
                     _ => todo!("opcode {:04x}", opcode),
                 },
                 _ => todo!("opcode {:04x}", opcode),
             }
         }
+    }
+
+    /// 8xy6 - SHR Vx {, Vy}.
+    ///
+    /// Set Vx = Vx SHR 1. If the least-significant bit of Vx is 1, then VF set to 1, otherwose 0.
+    /// then Vx is divided by 2.
+    fn shr_xy(&mut self, vx: u8, _vy: u8) {
+        let x = self.registers[vx as usize];
+        self.registers[0xF] = x & 0x01;
+        self.registers[vx as usize] = x >> 1;
     }
 
     /// 8xy5 - SUB Vx, Vy.
