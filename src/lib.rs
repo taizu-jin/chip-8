@@ -62,11 +62,21 @@ impl CPU {
                     5 => self.sub_xy(x, y),
                     6 => self.shr_xy(x, y),
                     7 => self.subn_xy(x, y),
+                    8 => self.shl_xy(x, y),
                     _ => todo!("opcode {:04x}", opcode),
                 },
                 _ => todo!("opcode {:04x}", opcode),
             }
         }
+    }
+    /// 8xy6 - SHL Vx {, Vy}.
+    ///
+    /// Set Vx = Vx SHL 1. If the most-significant bit of Vx is 1, then VF set to 1, otherwose 0.
+    /// then Vx is multiplied by 2.
+    fn shl_xy(&mut self, vx: u8, _vy: u8) {
+        let x = self.registers[vx as usize];
+        self.registers[0xF] = (x & 0x80) >> 7;
+        self.registers[vx as usize] = x << 1;
     }
 
     /// 8xy7 - subn Vx, Vy.
