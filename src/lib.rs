@@ -55,6 +55,7 @@ impl CPU {
                 0x7000..=0x7FFF => self.add(x, kk),
                 0x8000..=0x8FFF => match op_subgroup {
                     0 => self.ld(x, self.registers[y as usize]),
+                    1 => self.or_xy(x, y),
                     2 => self.and_xy(x, y),
                     4 => self.add(x, self.registers[y as usize]),
                     _ => todo!("opcode {:04x}", opcode),
@@ -62,6 +63,18 @@ impl CPU {
                 _ => todo!("opcode {:04x}", opcode),
             }
         }
+    }
+
+    /// 8xy1 - OR Vx, Vy
+    ///
+    /// Set Vx = Vx OR Vy. Performs  a bitwise OR on the values of Vx and Vy, then stores the
+    /// result in Vx. A bitwise OR compares the corresponding bits from two values, and if either
+    /// bit is 1, then the same bit in the result is also 1. Otherwise, it is 0.
+    fn or_xy(&mut self, vx: u8, vy: u8) {
+        let x = self.registers[vx as usize];
+        let y = self.registers[vy as usize];
+
+        self.registers[vx as usize] = x | y;
     }
 
     /// 8xy2 - AND Vx, Vy
