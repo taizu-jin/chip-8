@@ -1,13 +1,21 @@
 use std::todo;
 
 pub struct CPU {
-    pub program_counter: usize,
+    program_counter: usize,
     pub registers: [u8; 16],
     pub memory: [u8; 0x1000],
 }
 
 impl CPU {
     const SYSTEM_OFFEST: u16 = 0x200;
+
+    pub fn new() -> Self {
+        CPU {
+            program_counter: 0,
+            registers: [0; 16],
+            memory: [0; 4096],
+        }
+    }
 
     fn read_opcode(&self) -> u16 {
         let p = self.program_counter + Self::SYSTEM_OFFEST as usize;
@@ -50,6 +58,12 @@ impl CPU {
     }
 }
 
+impl Default for CPU {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use std::assert_eq;
@@ -58,11 +72,7 @@ mod tests {
 
     #[test]
     fn addition() {
-        let mut cpu = CPU {
-            program_counter: 0,
-            registers: [0; 16],
-            memory: [0; 4096],
-        };
+        let mut cpu = CPU::new();
 
         cpu.registers[0] = 5;
         cpu.registers[1] = 10;

@@ -3,11 +3,7 @@ use std::println;
 use chip_8_toy::CPU;
 
 fn main() {
-    let mut cpu = CPU {
-        program_counter: 0,
-        registers: [0; 16],
-        memory: [0; 4096],
-    };
+    let mut cpu = CPU::new();
 
     cpu.registers[0] = 5;
     cpu.registers[1] = 10;
