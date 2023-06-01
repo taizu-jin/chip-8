@@ -55,12 +55,13 @@ impl CPU {
         }
     }
 
-    fn add_xy(&mut self, x: u8, y: u8) {
-        let x_ = self.registers[x as usize];
-        let y_ = self.registers[y as usize];
+    /// 8xy4 - ADD Vx, Vy.
+    fn add_xy(&mut self, vx: u8, vy: u8) {
+        let x = self.registers[vx as usize];
+        let y = self.registers[vy as usize];
 
-        let (val, is_overflown) = x_.overflowing_add(y_);
-        self.registers[x as usize] = val;
+        let (val, is_overflown) = x.overflowing_add(y);
+        self.registers[vx as usize] = val;
 
         if is_overflown {
             self.registers[0xF] = 1;
@@ -69,16 +70,25 @@ impl CPU {
         }
     }
 
+    /// 2nnn - CALL addr.
+    ///
+    /// Call subroutine at nnn. The interpreter increments the stack pointer, then puts the current
+    /// PC on the top of the stack. The PC is then set to nnn.
+    ///
+    /// # Panics
+    ///
+    /// 1. Address is in reserved system memory (until 0x200).
+    /// 2. Stack overflow.
     fn call(&mut self, addr: u16) {
         if addr < Self::SYSTEM_OFFEST {
-            panic!("Trying to access memory reserved for the system!")
+            panic!("Trying to call from memory reserved for the system!")
         }
 
         let sp = self.stack_pointer;
         let stack = &mut self.stack;
 
         if sp > stack.len() {
-            panic!("Stach overflow!")
+            panic!("Stack overflow!")
         }
 
         stack[sp] = self.program_counter as u16;
@@ -86,6 +96,11 @@ impl CPU {
         self.program_counter = addr as usize;
     }
 
+    /// 00EE - RET
+    ///
+    /// # Panics
+    ///
+    /// Stack underflow.
     fn ret(&mut self) {
         if self.stack_pointer == 0 {
             panic!("Stack underflow");
@@ -96,6 +111,7 @@ impl CPU {
         self.program_counter = call_addr as usize;
     }
 
+    /// Reset CPU to initial state
     pub fn reset(&mut self) {
         *self = Self::new();
     }
