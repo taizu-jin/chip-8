@@ -59,6 +59,7 @@ impl CPU {
                     2 => self.and_xy(x, y),
                     3 => self.xor_xy(x, y),
                     4 => self.add(x, self.registers[y as usize]),
+                    5 => self.sub_xy(x, y),
                     _ => todo!("opcode {:04x}", opcode),
                 },
                 _ => todo!("opcode {:04x}", opcode),
@@ -66,7 +67,26 @@ impl CPU {
         }
     }
 
-    /// 8xy1 - XOR Vx, Vy
+    /// 8xy5 - SUB Vx, Vy.
+    ///
+    /// Set Vx = Vx - Vy, set VF = NOT borrow. if Vx ¿ Vy, then VF is set to 1, otherwise 0. Then
+    /// Vy is subtrated from Vx, and the results stored in Vx.
+    fn sub_xy(&mut self, vx: u8, vy: u8) {
+        let x = self.registers[vx as usize];
+        let y = self.registers[vy as usize];
+
+        let (val, is_overflown) = x.overflowing_sub(y);
+
+        self.registers[vx as usize] = val;
+
+        if is_overflown {
+            self.registers[0xF] = 1;
+        } else {
+            self.registers[0xF] = 0;
+        }
+    }
+
+    /// 8xy1 - XOR Vx, Vy.
     ///
     /// Set Vx = Vx XOR Vy. Performs  a bitwise exclusive OR on the values of Vx and Vy, then stores the
     /// result in Vx. An exclusive bitwise OR compares bits from two values, and if the bits arne
@@ -79,7 +99,7 @@ impl CPU {
         self.registers[vx as usize] = x ^ y;
     }
 
-    /// 8xy1 - OR Vx, Vy
+    /// 8xy1 - OR Vx, Vy.
     ///
     /// Set Vx = Vx OR Vy. Performs  a bitwise OR on the values of Vx and Vy, then stores the
     /// result in Vx. A bitwise OR compares the corresponding bits from two values, and if either
@@ -91,7 +111,7 @@ impl CPU {
         self.registers[vx as usize] = x | y;
     }
 
-    /// 8xy2 - AND Vx, Vy
+    /// 8xy2 - AND Vx, Vy.
     ///
     /// Set Vx = Vx AND Vy. Performs  a bitwise AND on the values of Vx and Vy, then stores the
     /// result in Vx. A bitwise AND compares the corresponding bits from two values, and if both
@@ -110,7 +130,7 @@ impl CPU {
         self.program_counter = addr as usize;
     }
 
-    /// 3xkk - SE Vx, byte
+    /// 3xkk - SE Vx, byte.
     ///
     /// Skip next instructon if Vx = kk. The interpreter compares register Vx to kk, and if they
     /// are equal, increments the program counter by 2.
@@ -120,7 +140,7 @@ impl CPU {
         }
     }
 
-    /// 4xkk - SNE Vx, byte
+    /// 4xkk - SNE Vx, byte.
     ///
     /// Skip next instruction if Vx != kk. The interpreter compares register Vx to kk, and if they
     /// are not equal, increments the program counter by 2.
@@ -130,14 +150,14 @@ impl CPU {
         }
     }
 
-    /// 6xkk - LD Vx, byte
+    /// 6xkk - LD Vx, byte.
     ///
     /// Set Vx = kk. The interpreter puts the value kk into register Vx.
     fn ld(&mut self, vx: u8, kk: u8) {
         self.registers[vx as usize] = kk;
     }
 
-    /// 7xkk - ADD Vx, byte
+    /// 7xkk - ADD Vx, byte.
     ///
     /// Set Vx = Vx + kk. Adds the value kk to the value of register Vx, then stores the result in
     /// Vx.
@@ -180,7 +200,7 @@ impl CPU {
         self.program_counter = addr as usize;
     }
 
-    /// 00EE - RET
+    /// 00EE - RET.
     ///
     /// Return from a subroutine. The interpreter sets the program counter to the address at the
     /// top of the stack, then substracts 1 from the stack pointer.
