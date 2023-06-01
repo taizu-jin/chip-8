@@ -49,6 +49,7 @@ impl CPU {
                 0x1000..=0x1FFF => self.jmp(nnn),
                 0x2000..=0x2FFF => self.call(nnn),
                 0x3000..=0x3FFF => self.se(x, kk),
+                0x4000..=0x4FFF => self.sne(x, kk),
                 0x8000..=0x8FFF => match op_subgroup {
                     4 => self.add_xy(x, y),
                     _ => todo!("opcode {:04x}", opcode),
@@ -71,6 +72,16 @@ impl CPU {
     /// are equal, increments the program counter by 2.
     fn se(&mut self, vx: u8, kk: u8) {
         if vx == kk {
+            self.program_counter += 2;
+        }
+    }
+
+    /// 4xkk - SNE Vx, byte
+    ///
+    /// Skip next instruction if Vx != kk. The interpreter compares register Vx to kk, and if they
+    /// are not equal, increments the program counter by 2.
+    fn sne(&mut self, vx: u8, kk: u8) {
+        if vx != kk {
             self.program_counter += 2;
         }
     }
